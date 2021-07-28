@@ -9,11 +9,22 @@ namespace Basket.Infrastructure.Repo
 {
     public class DiscountRepo : IDiscountRepo
     {
-        private readonly List<Discount> _discounts;
         private readonly List<IDiscountCalculator> _discountCalculators;
-        public DiscountRepo()
+
+        public DiscountRepo(List<IDiscountCalculator> discountCalculators)
         {
-            _discounts = new List<Discount> {
+            _discountCalculators = discountCalculators;
+        }
+
+        public List<IDiscountCalculator> GetDiscountCalculators()
+        {
+            return _discountCalculators;
+        }
+
+        public List<Discount> GetProductWithDiscounts(List<int> productCodes)
+        {
+            // This should come from database
+            var discounts = new List<Discount> {
                 new Discount
                 {
                     Id = 1,
@@ -32,22 +43,7 @@ namespace Basket.Infrastructure.Repo
                 }
             };
 
-            _discountCalculators = new List<IDiscountCalculator>
-            {
-                new BuyNGetOneFree(),
-                new BuyNGetAnotherProductOneHalfPrice()
-            };
-        }
-
-        public List<IDiscountCalculator> GetDiscountCalculators()
-        {
-            return _discountCalculators;
-        }
-
-        public List<Discount> GetProductWithDiscounts(List<int> productCodes)
-        {
-            // This should come from database
-            return _discounts.Where(x => productCodes.Contains(x.ProductCode)).ToList();
+            return discounts.Where(x => productCodes.Contains(x.ProductCode)).ToList();
         }
     }
 }

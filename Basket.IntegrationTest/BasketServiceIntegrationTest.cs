@@ -1,7 +1,9 @@
 using Basket.Domain.Interfaces;
 using Basket.Domain.Models;
+using Basket.Infrastructure.DiscountsCalculator;
 using Basket.Infrastructure.Repo;
 using FluentAssertions;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Basket.Service.IntegrationTest
@@ -32,7 +34,13 @@ namespace Basket.Service.IntegrationTest
 
         public BasketServiceIntegrationTest()
         {
-            _discountRepo = new DiscountRepo();
+            var discountCalculators = new List<IDiscountCalculator>
+            {
+                new BuyNGetOneFree(),
+                new BuyNGetAnotherProductOneHalfPrice()
+            };
+
+            _discountRepo = new DiscountRepo(discountCalculators);
             _basket = new Basket(_discountRepo);
         }
 
@@ -75,7 +83,7 @@ namespace Basket.Service.IntegrationTest
             _basket.Add(_butter);
             _basket.Add(_bread);
 
-            for(int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)
             {
                 _basket.Add(_milk);
             }
