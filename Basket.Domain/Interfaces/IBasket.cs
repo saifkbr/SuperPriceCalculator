@@ -7,6 +7,8 @@ namespace Basket.Domain.Interfaces
     {
         List<BasketProducts> Add(Product product);
 
+        List<BasketProducts> Add(List<Product> product);
+
         decimal TotalPrice { get; }
     }
 }

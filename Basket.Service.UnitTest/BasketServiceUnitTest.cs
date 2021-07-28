@@ -11,6 +11,7 @@ namespace Basket.Service.UnitTest
     public class BasketServiceUnitTest
     {
         private readonly Mock<IDiscountRepo> _discountRepo;
+        private IBasket _basket;
 
         private readonly static Product _butter = new Product
         {
@@ -118,13 +119,24 @@ namespace Basket.Service.UnitTest
         [MemberData(nameof(Products))]
         public void AddProduct(List<Product> products, int quantity)
         {
-            var basket = new Basket(_discountRepo.Object);
+            _basket = new Basket(_discountRepo.Object);
             List<BasketProducts> basketProducts = new List<BasketProducts>();
 
             foreach (var item in products)
             {
-                basketProducts = basket.Add(item);
+                basketProducts = _basket.Add(item);
             }
+
+            basketProducts.Should().HaveCount(quantity);
+        }
+
+        [Theory]
+        [MemberData(nameof(Products))]
+        public void AddProducts(List<Product> products, int quantity)
+        {
+            _basket = new Basket(_discountRepo.Object);
+
+            List<BasketProducts> basketProducts = _basket.Add(products);
 
             basketProducts.Should().HaveCount(quantity);
         }
@@ -132,9 +144,9 @@ namespace Basket.Service.UnitTest
         [Fact]
         public void TotalPrice_OneNonDiscountProductAdded_ShouldReturnValidTotalPrice()
         {
-            var basket = new Basket(_discountRepo.Object);
-            var products = basket.Add(_butter);
-            var totalPrice = basket.TotalPrice;
+            _basket = new Basket(_discountRepo.Object);
+            var products = _basket.Add(_butter);
+            var totalPrice = _basket.TotalPrice;
 
             products.Should().HaveCount(1);
             totalPrice.Should().Be(_butter.Price);
@@ -143,11 +155,10 @@ namespace Basket.Service.UnitTest
         [Fact]
         public void TotalPrice_MultipleNonDiscountProductAdded_ShouldReturnValidTotalPrice()
         {
-            var basket = new Basket(_discountRepo.Object);
-            basket.Add(_butter);
-            basket.Add(_milk);
-            basket.Add(_bread);
-            var totalPrice = basket.TotalPrice;
+            _basket = new Basket(_discountRepo.Object);
+            _basket.Add(_productsThree);
+
+            var totalPrice = _basket.TotalPrice;
 
             totalPrice.Should().Be(_butter.Price + _milk.Price + _bread.Price);
         }

@@ -19,14 +19,16 @@ namespace Basket.Service
 
         public List<BasketProducts> Add(Product product)
         {
-            if (product.IsValid())
+            AddProduct(product);
+
+            return _products;
+        }
+
+        public List<BasketProducts> Add(List<Product> products)
+        {
+            foreach (var product in products)
             {
-                if (_products.Any(x => x.Product.Code == product.Code))
-                {
-                    _products.SingleOrDefault(x => x.Product.Code == product.Code).Quantity += 1;
-                }
-                else
-                    _products.Add(new BasketProducts { Product = product, Quantity = 1 });
+                AddProduct(product);
             }
 
             return _products;
@@ -68,6 +70,19 @@ namespace Basket.Service
                     }
                 }
                 return totalPrice;
+            }
+        }
+
+        private void AddProduct(Product product)
+        {
+            if (product.IsValid())
+            {
+                if (_products.Any(x => x.Product.Code == product.Code))
+                {
+                    _products.SingleOrDefault(x => x.Product.Code == product.Code).Quantity += 1;
+                }
+                else
+                    _products.Add(new BasketProducts { Product = product, Quantity = 1 });
             }
         }
     }
